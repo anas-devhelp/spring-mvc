@@ -7,10 +7,12 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.amazonaws.services.kms.model.NotFoundException;
 import com.jSolutions.dao.common.UserDao;
 import com.jSolutions.entities.JSolutionEntity;
 import com.jSolutions.entities.common.Domain;
 import com.jSolutions.entities.common.User;
+import com.jSolutions.exceptions.NotBelongsToDomainException;
 
 @Service("userService")
 @Transactional
@@ -30,7 +32,14 @@ public class UserServiceImpl implements UserService{
 	}
 	@Override
 	public User read(Integer id, User loginUser) {
-		return (User) userDao.read(id, loginUser);
+		try {
+			return (User) userDao.read(id, loginUser);
+		} catch (NotFoundException e) {
+			e.printStackTrace();
+		} catch (NotBelongsToDomainException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	@Override
 	public void update(JSolutionEntity entity, User loginUser) {
